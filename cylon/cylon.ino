@@ -1,7 +1,7 @@
 #include "FastLED.h"
 
 // How many leds in your strip?
-#define NUM_LEDS 150 
+#define NUM_LEDS 150
 
 // For led chips like Neopixels, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
@@ -13,8 +13,6 @@
 CRGB leds[NUM_LEDS];
 
 void setup() { 
-  Serial.begin(57600);
-  Serial.println("resetting");
   LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
   LEDS.setBrightness(84);
 }

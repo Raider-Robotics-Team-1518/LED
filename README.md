@@ -1,5 +1,18 @@
 # LED
 
+2018 - "blinkies" is the project we're using for the bot. It shows random color palettes while the bot is not active, then the alliance color during the game. 
+
+* RoboRio sends high/low signals over inputs 3 & 4 on the arduino.
+* Code switches on those pin states:
+	* If both low/off - random palettes
+	* If one high - all solid red
+	* If the other high - all solid blue
+	* If both high - all off / black 
+
+See comments in the project code for further details.
+
+----
+
 Some of the LED "pixel" sketches we've been playing with. Some of these are examples from the FastLED library.
 
 You'll need the FastLED library installed. We have found that installing it via the IDE was the only way to make it work. 
