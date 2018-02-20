@@ -32,7 +32,7 @@ int RED = 2;
 // This is an array of leds.  One item for each led in your strip.
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS  200        // range of 0 - 255 
+#define BRIGHTNESS  150        // range of 0 - 255 
 #define LED_TYPE    WS2812B    // our pixel strip type
 #define COLOR_ORDER GRB        // color order - green/red/blue
 #define UPDATES_PER_SECOND 250 // controls update frequency
@@ -86,14 +86,16 @@ void loop() {
 }
 
 void turnColor(int color) {
+  CRGB clr;
+  if (color == BLUE) {
+    clr = CRGB::Blue;
+  } else if (color == RED) {
+    clr = CRGB::Red;
+  } else {
+    clr = CRGB::Black;
+  }
   for (int led = 0; led < NUM_LEDS; led = led + 1) {
-    if (color == BLUE) {
-      leds[led] = CRGB::Blue;
-    } else if (color == RED) {
-      leds[led] = CRGB::Red;
-    } else {
-      leds[led] = CRGB::Black;
-    }
+    leds[led] = clr;
   }
 }
 
