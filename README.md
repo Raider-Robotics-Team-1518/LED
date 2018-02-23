@@ -11,6 +11,8 @@
 
 See comments in the project code for further details.
 
+![Circuit layout](circuit_layout.png)
+
 ----
 
 Some of the LED "pixel" sketches we've been playing with. Some of these are examples from the FastLED library.

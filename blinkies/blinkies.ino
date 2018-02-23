@@ -32,7 +32,7 @@ int RED = 2;
 // This is an array of leds.  One item for each led in your strip.
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS  150        // range of 0 - 255 
+#define BRIGHTNESS  200        // range of 0 - 255 
 #define LED_TYPE    WS2812B    // our pixel strip type
 #define COLOR_ORDER GRB        // color order - green/red/blue
 #define UPDATES_PER_SECOND 250 // controls update frequency
