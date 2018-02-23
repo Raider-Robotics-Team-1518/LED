@@ -14,26 +14,30 @@
 
 #include "FastLED.h"
 
+// UPDATE THESE VALUES TO MATCH YOUR SETUP
+// 
 // define pins that receive high/low values from Rio
 int inputPin3 = 3;
 int inputPin4 = 4;
+// Data pin that led data will be written out to the LEDs over
+#define DATA_PIN 5
+// How many leds are in the strip?
+#define NUM_LEDS 94
+// don't go above about 60 if you're powering off the power 5v
+// lead on the power distr. panel instead of USB
+#define BRIGHTNESS  200        // range of 0 - 255 
+#define LED_TYPE    WS2812B    // our pixel strip type
 
+// THE REMAINDER CAN PROBABLY LEFT AS-IS
+// 
 // constants for solid colors
 int BLACK = 0;
 int BLUE = 1;
 int RED = 2;
 
-// How many leds are in the strip?
-#define NUM_LEDS 94
-
-// Data pin that led data will be written out to the LEDs over
-#define DATA_PIN 5
-
 // This is an array of leds.  One item for each led in your strip.
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS  200        // range of 0 - 255 
-#define LED_TYPE    WS2812B    // our pixel strip type
 #define COLOR_ORDER GRB        // color order - green/red/blue
 #define UPDATES_PER_SECOND 250 // controls update frequency
 
