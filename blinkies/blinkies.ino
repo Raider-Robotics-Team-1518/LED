@@ -17,29 +17,37 @@
 // UPDATE THESE VALUES TO MATCH YOUR SETUP
 // 
 // define pins that receive high/low values from Rio
-int inputPin3 = 3;
-int inputPin4 = 4;
+#define matchStartedPin 6
+#define targetInViewPin 7
+#define linedUpPin 8
+#define alliancePin 9
 // Data pin that led data will be written out to the LEDs over
-#define DATA_PIN 5
-// How many leds are in the strip?
-#define NUM_LEDS 94
-// don't go above about 60 if you're powering off the power 5v
-// lead on the power distr. panel instead of USB
-#define BRIGHTNESS  200        // range of 0 - 255 
-#define LED_TYPE    WS2812B    // our pixel strip type
+
+#define LEFT_UPRIGHT_PIN 3
+#define RECTANGLE_PIN 4
+#define RIGHT_UPRIGHT_PIN 5
+
+#define NUM_LEDS_LEFT 27
+#define NUM_LEDS_RIGHT 27
+#define NUM_LEDS_RECTANGLE 42
+
+#define BRIGHTNESS 100
+#define COLOR_ORDER GRB
+#define CHIPSET WS2812B
+#define UPDATES_PER_SECOND 200
+
+CRGB left_leds[NUM_LEDS_LEFT];
+CRGB right_leds[NUM_LEDS_RIGHT];
+CRGB rectangle_leds[NUM_LEDS_RECTANGLE];
 
 // THE REMAINDER CAN PROBABLY LEFT AS-IS
 // 
 // constants for solid colors
-int BLACK = 0;
-int BLUE = 1;
-int RED = 2;
-
-// This is an array of leds.  One item for each led in your strip.
-CRGB leds[NUM_LEDS];
-
-#define COLOR_ORDER GRB        // color order - green/red/blue
-#define UPDATES_PER_SECOND 250 // controls update frequency
+#define BLACK 0
+#define BLUE 1
+#define RED 2
+#define YELLOW 3
+#define GREEN 4
 
 // variables hold some palette info for later use
 CRGBPalette16 currentPalette;
@@ -53,13 +61,21 @@ extern const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM;
 void setup() {
     delay(2000); // delay for 2 sec while the arduino powers up
     // set up the FastLED library to write to our configuration of LEDs
-    FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<CHIPSET, LEFT_UPRIGHT_PIN, COLOR_ORDER>(left_leds, NUM_LEDS_LEFT).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<CHIPSET, RIGHT_UPRIGHT_PIN, COLOR_ORDER>(right_leds, NUM_LEDS_RIGHT).setCorrection( TypicalLEDStrip );
+    FastLED.addLeds<CHIPSET, RECTANGLE_PIN, COLOR_ORDER>(rectangle_leds, NUM_LEDS_RECTANGLE).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(  BRIGHTNESS );
-    // set up our input pins on the arduino
-    pinMode(inputPin3, INPUT);
-    pinMode(inputPin4, INPUT);
-    digitalWrite(inputPin3, HIGH);
-    digitalWrite(inputPin4, HIGH);
+    
+    pinMode(matchStartedPin, INPUT);
+    pinMode(targetInViewPin, INPUT);
+    pinMode(linedUpPin, INPUT);
+    pinMode(alliancePin, INPUT);
+    
+    digitalWrite(matchStartedPin, LOW);
+    digitalWrite(targetInViewPin, LOW);
+    digitalWrite(linedUpPin, LOW);
+    digitalWrite(alliancePin, LOW);
+    
     // set our starting palette
     currentPalette = RainbowColors_p;
     currentBlending = LINEARBLEND;
@@ -73,17 +89,31 @@ void loop() {
     startIndex = startIndex + 1; 
     // reads from the switch pins and makes sure they are
     // a 1 or 0 in the 
-    int reading3 = 1 - digitalRead(inputPin3);
-    int reading4 = 1 - digitalRead(inputPin4);
+    bool isMatchStarted = (1 - digitalRead(matchStartedPin)) == 0;
+    bool isTargetInView = (1 - digitalRead(targetInViewPin)) == 0;
+    bool isLinedUp = (1 - digitalRead(linedUpPin)) == 0;
+    bool isAllianceColorRed = (1 - digitalRead(alliancePin)) == 0;
 
-    if (reading3 == 0 && reading4 == 0) {
-        FillLEDsFromPaletteColors( startIndex);
-    } else if (reading3 == 1 && reading4 == 0) {
-        turnColor(RED);
-    } else if (reading3 == 0 && reading4 == 1) {
-        turnColor(BLUE);
+    isMatchStarted = false;
+    isTargetInView = true;
+    isLinedUp = false;
+    isAllianceColorRed = true;
+    if (isMatchStarted) {
+        if (isTargetInView) {
+          if (isLinedUp) {
+            turnColor(GREEN);
+          } else {
+            turnColor(YELLOW);
+          }
+        } else {
+          if (isAllianceColorRed) {
+            turnColor(RED);
+          } else {
+            turnColor(BLUE);
+          }
+        }
     } else {
-        turnColor(BLACK);
+        FillLEDsFromPaletteColors( startIndex);
     }
     FastLED.show();
     delay(1000 / UPDATES_PER_SECOND);
@@ -91,15 +121,29 @@ void loop() {
 
 void turnColor(int color) {
   CRGB clr;
-  if (color == BLUE) {
-    clr = CRGB::Blue;
-  } else if (color == RED) {
-    clr = CRGB::Red;
-  } else {
-    clr = CRGB::Black;
+  switch(color) {
+    case BLUE:
+        clr = CRGB::Blue;
+        break;
+    case RED:
+        clr = CRGB::Red;
+        break;
+    case YELLOW:
+        clr = CRGB::Yellow;
+        break;
+    case GREEN:
+        clr = CRGB::Green;
+        break;
+    default:
+        clr = CRGB::Black;
+        break;
   }
-  for (int led = 0; led < NUM_LEDS; led = led + 1) {
-    leds[led] = clr;
+  for (int i = 0; i < NUM_LEDS_LEFT; i++) {
+    left_leds[i] = clr;
+    right_leds[i] = clr;
+    }
+  for (int i = 0; i < NUM_LEDS_RECTANGLE; i++) {
+    rectangle_leds[i] = clr;
   }
 }
 
@@ -107,10 +151,15 @@ void turnColor(int color) {
 void FillLEDsFromPaletteColors( uint8_t colorIndex)
 {
     uint8_t brightness = 255;
-    for( int i = 0; i < NUM_LEDS; i++) {
-        leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
-        colorIndex += 3;
+    for (int i = 0; i < NUM_LEDS_LEFT; i++) {
+        left_leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
+        right_leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
     }
+    for (int i = 0; i < NUM_LEDS_RECTANGLE; i++) {
+        rectangle_leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
+    }
+
+    colorIndex += 3;
 }
 
 
@@ -145,7 +194,7 @@ void ChangePalettePeriodically()
 void SetupTotallyRandomPalette()
 {
     for( int i = 0; i < 16; i++) {
-        currentPalette[i] = CHSV( random8(), 255, random8());
+        currentPalette[i] = CHSV( random8(), random8(), random8());
     }
 }
 
@@ -174,5 +223,3 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black,
     CRGB::Black
 };
-
-
