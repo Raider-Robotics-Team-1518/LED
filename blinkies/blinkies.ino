@@ -15,19 +15,14 @@
 #include "FastLED.h"
 
 // UPDATE THESE VALUES TO MATCH YOUR SETUP
-// 
-// define pins that receive high/low values from Rio
-#define matchStartedPin 6
-#define targetInViewPin 7
-#define linedUpPin 8
-#define alliancePin 9
+
 // Data pin that led data will be written out to the LEDs over
 
 #define LEFT_UPRIGHT_PIN 3
 #define RECTANGLE_PIN 4
 #define RIGHT_UPRIGHT_PIN 5
 
-#define NUM_LEDS_LEFT 27
+#define NUM_LEDS_LEFT 8
 #define NUM_LEDS_RIGHT 27
 #define NUM_LEDS_RECTANGLE 42
 
@@ -44,10 +39,11 @@ CRGB rectangle_leds[NUM_LEDS_RECTANGLE];
 // 
 // constants for solid colors
 #define BLACK 0
-#define BLUE 1
-#define RED 2
+#define BLUE 2
+#define RED 1
 #define YELLOW 3
 #define GREEN 4
+int currentColor = BLACK;
 
 // variables hold some palette info for later use
 CRGBPalette16 currentPalette;
@@ -65,16 +61,9 @@ void setup() {
     FastLED.addLeds<CHIPSET, RIGHT_UPRIGHT_PIN, COLOR_ORDER>(right_leds, NUM_LEDS_RIGHT).setCorrection( TypicalLEDStrip );
     FastLED.addLeds<CHIPSET, RECTANGLE_PIN, COLOR_ORDER>(rectangle_leds, NUM_LEDS_RECTANGLE).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(  BRIGHTNESS );
+
+    Serial.begin(9600);
     
-    pinMode(matchStartedPin, INPUT);
-    pinMode(targetInViewPin, INPUT);
-    pinMode(linedUpPin, INPUT);
-    pinMode(alliancePin, INPUT);
-    
-    digitalWrite(matchStartedPin, LOW);
-    digitalWrite(targetInViewPin, LOW);
-    digitalWrite(linedUpPin, LOW);
-    digitalWrite(alliancePin, LOW);
     
     // set our starting palette
     currentPalette = RainbowColors_p;
@@ -87,36 +76,39 @@ void loop() {
 
     static uint8_t startIndex = 0;
     startIndex = startIndex + 1; 
-    // reads from the switch pins and makes sure they are
-    // a 1 or 0 in the 
-    bool isMatchStarted = (1 - digitalRead(matchStartedPin)) == 0;
-    bool isTargetInView = (1 - digitalRead(targetInViewPin)) == 0;
-    bool isLinedUp = (1 - digitalRead(linedUpPin)) == 0;
-    bool isAllianceColorRed = (1 - digitalRead(alliancePin)) == 0;
 
-    isMatchStarted = false;
-    isTargetInView = true;
-    isLinedUp = false;
-    isAllianceColorRed = true;
-    if (isMatchStarted) {
-        if (isTargetInView) {
-          if (isLinedUp) {
-            turnColor(GREEN);
-          } else {
-            turnColor(YELLOW);
-          }
-        } else {
-          if (isAllianceColorRed) {
-            turnColor(RED);
-          } else {
-            turnColor(BLUE);
-          }
-        }
+
+    int num = int(Serial.read() - '0');
+    switch (num) {
+      case 0:
+        currentColor = BLACK;
+        break;
+      case 1:
+        currentColor = RED;
+        break;
+      case 2:
+        currentColor = BLUE;
+        break;
+      case 3:
+        currentColor = YELLOW;
+        break;
+      case 4:
+        currentColor = GREEN;
+        break;
+      case 5:
+        currentColor = 5;
+        break;
+      default:
+        currentColor = currentColor;
+   }
+
+    if (currentColor < 5){
+      turnColor(currentColor);
+      
     } else {
-        FillLEDsFromPaletteColors( startIndex);
-    }
+      FillLEDsFromPaletteColors(startIndex);
+    } 
     FastLED.show();
-    delay(1000 / UPDATES_PER_SECOND);
 }
 
 void turnColor(int color) {
