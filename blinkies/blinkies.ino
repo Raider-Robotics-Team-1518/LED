@@ -1,28 +1,15 @@
 /*
  * blinkies - robot controlled LEDs for making our bot blinky
  * 
- * Uses the WS2812B RGB pixel LEDs. It shows random color palettes while the bot is not active, then the alliance color during the game. 
- *
- * RoboRio sends high/low signals to inputs 3 & 4 on the arduino.
- * Code below switches on those pin states:
- *      * If both high/on - random palettes
- *      * If one high - all solid red
- *      * If the other high - all solid blue
- *      * If both low/off - all off / black 
- * 
 */
 
 #include "FastLED.h"
-
-// UPDATE THESE VALUES TO MATCH YOUR SETUP
-
-// Data pin that led data will be written out to the LEDs over
 
 #define LEFT_UPRIGHT_PIN 3
 #define RECTANGLE_PIN 4
 #define RIGHT_UPRIGHT_PIN 5
 
-#define NUM_LEDS_LEFT 8
+#define NUM_LEDS_LEFT 27
 #define NUM_LEDS_RIGHT 27
 #define NUM_LEDS_RECTANGLE 42
 
@@ -35,7 +22,6 @@ CRGB left_leds[NUM_LEDS_LEFT];
 CRGB right_leds[NUM_LEDS_RIGHT];
 CRGB rectangle_leds[NUM_LEDS_RECTANGLE];
 
-// THE REMAINDER CAN PROBABLY LEFT AS-IS
 // 
 // constants for solid colors
 #define BLACK 0
