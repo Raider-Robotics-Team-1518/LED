@@ -17,12 +17,12 @@
 // UPDATE THESE VALUES TO MATCH YOUR SETUP
 // 
 // define pins that receive high/low values from Rio
-int inputPin3 = 3;
+int inputPin5 = 5;
 int inputPin4 = 4;
 // Data pin that led data will be written out to the LEDs over
-#define DATA_PIN 5
+#define DATA_PIN 3
 // How many leds are in the strip?
-#define NUM_LEDS 94
+#define NUM_LEDS 96
 // don't go above about 60 if you're powering off the power 5v
 // lead on the power distr. panel instead of USB
 #define BRIGHTNESS  200        // range of 0 - 255 
@@ -56,9 +56,9 @@ void setup() {
     FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
     FastLED.setBrightness(  BRIGHTNESS );
     // set up our input pins on the arduino
-    pinMode(inputPin3, INPUT);
+    pinMode(inputPin5, INPUT);
     pinMode(inputPin4, INPUT);
-    digitalWrite(inputPin3, HIGH);
+    digitalWrite(inputPin5, HIGH);
     digitalWrite(inputPin4, HIGH);
     // set our starting palette
     currentPalette = RainbowColors_p;
@@ -73,14 +73,14 @@ void loop() {
     startIndex = startIndex + 1; 
     // reads from the switch pins and makes sure they are
     // a 1 or 0 in the 
-    int reading3 = 1 - digitalRead(inputPin3);
+    int reading5 = 1 - digitalRead(inputPin5);
     int reading4 = 1 - digitalRead(inputPin4);
 
-    if (reading3 == 0 && reading4 == 0) {
+    if (reading5 == 1 && reading4 == 1) {
         FillLEDsFromPaletteColors( startIndex);
-    } else if (reading3 == 1 && reading4 == 0) {
+    } else if (reading5 == 0 && reading4 == 1) {
         turnColor(RED);
-    } else if (reading3 == 0 && reading4 == 1) {
+    } else if (reading5 == 1 && reading4 == 0) {
         turnColor(BLUE);
     } else {
         turnColor(BLACK);
@@ -174,5 +174,3 @@ const TProgmemPalette16 myRedWhiteBluePalette_p PROGMEM =
     CRGB::Black,
     CRGB::Black
 };
-
-
