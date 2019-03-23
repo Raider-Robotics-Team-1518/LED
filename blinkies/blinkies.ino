@@ -13,7 +13,7 @@
 #define NUM_LEDS_RIGHT 27
 #define NUM_LEDS_RECTANGLE 42
 
-#define BRIGHTNESS 100
+#define BRIGHTNESS 200
 #define COLOR_ORDER GRB
 #define CHIPSET WS2812B
 #define UPDATES_PER_SECOND 200
@@ -29,7 +29,8 @@ CRGB rectangle_leds[NUM_LEDS_RECTANGLE];
 #define RED 1
 #define YELLOW 3
 #define GREEN 4
-int currentColor = BLACK;
+#define RAINBOW 5
+int currentColor = RAINBOW;
 
 // variables hold some palette info for later use
 CRGBPalette16 currentPalette;
@@ -67,7 +68,7 @@ void loop() {
     int num = int(Serial.read() - '0');
     switch (num) {
       case 0:
-        currentColor = BLACK;
+        currentColor = RAINBOW;
         break;
       case 1:
         currentColor = RED;
@@ -82,13 +83,13 @@ void loop() {
         currentColor = GREEN;
         break;
       case 5:
-        currentColor = 5;
+        currentColor = RAINBOW;
         break;
       default:
         currentColor = currentColor;
    }
 
-    if (currentColor < 5){
+    if (currentColor < RAINBOW){
       turnColor(currentColor);
       
     } else {
