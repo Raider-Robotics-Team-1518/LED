@@ -34,6 +34,7 @@ int inputPin4 = 4;
 int BLACK = 0;
 int BLUE = 1;
 int RED = 2;
+int GREEN = 3;
 
 // This is an array of leds.  One item for each led in your strip.
 CRGB leds[NUM_LEDS];
@@ -82,8 +83,8 @@ void loop() {
         turnColor(RED);
     } else if (reading5 == 1 && reading4 == 0) {
         turnColor(BLUE);
-    } else {
-        turnColor(BLACK);
+    } else if(reading5 == 0 && reading4 == 0) {
+        turnColor(GREEN);
     }
     FastLED.show();
     delay(1000 / UPDATES_PER_SECOND);
@@ -95,6 +96,8 @@ void turnColor(int color) {
     clr = CRGB::Blue;
   } else if (color == RED) {
     clr = CRGB::Red;
+  } else if (color == GREEN) {
+    clr = CRGB::Green;
   } else {
     clr = CRGB::Black;
   }
