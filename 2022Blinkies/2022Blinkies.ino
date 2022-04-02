@@ -1,17 +1,17 @@
 #include <FastLED.h>
 
 // UPDATE THESE 
-#define NUM_LEDS 8
-#define LEDS_PER_SIDE 4
+#define NUM_LEDS 32
+#define LEDS_PER_SIDE 16
 #define DATA_PIN 2
 #define COLOR_ORDER GRB
-#define BRIGHTNESS 32
+#define BRIGHTNESS 156
 
 // define the pin numbers for the DIO input "switches"
-#define INPUT_PIN_1 5
-#define INPUT_PIN_2 6
-#define INPUT_PIN_3 7
-#define INPUT_PIN_4 8
+#define INPUT_PIN_1 6
+#define INPUT_PIN_2 7
+#define INPUT_PIN_3 8
+#define INPUT_PIN_4 9
 
 // constants for solid colors
 #define BLACK 0
@@ -36,7 +36,7 @@
 // you shouldn't need to modify these variables
 CRGB realleds[NUM_LEDS];
 CRGBArray<NUM_LEDS> leds;
-CRGBSet left_side_leds(leds(0, LEDS_PER_SIDE - 1));
+CRGBSet left_side_leds(leds(LEDS_PER_SIDE - 1, 0));
 CRGBSet right_side_leds(leds(LEDS_PER_SIDE, NUM_LEDS - 1));
 int currentColor = BLACK;
 int flash_state = 0;
@@ -167,10 +167,10 @@ int get_selected_pattern_from_rio() {
   // the "1 -" part below converts a 1 into a 0 and 0 into a 1
   // which seems odd, but that makes our logic here match what's
   // set in the Java code
-  int dio_pin_1 = (1 - digitalRead(INPUT_PIN_1));
-  int dio_pin_2 = (1 - digitalRead(INPUT_PIN_2)) * 2;
-  int dio_pin_3 = (1 - digitalRead(INPUT_PIN_3)) * 4;
-  int dio_pin_4 = (1 - digitalRead(INPUT_PIN_4)) * 8;
+  int dio_pin_1 = ( digitalRead(INPUT_PIN_1));
+  int dio_pin_2 = ( digitalRead(INPUT_PIN_2)) * 2;
+  int dio_pin_3 = ( digitalRead(INPUT_PIN_3)) * 4;
+  int dio_pin_4 = ( digitalRead(INPUT_PIN_4)) * 8;
 
   /*
    * The multiplication let's us easily figure out which combination of
@@ -202,19 +202,19 @@ void loop() {
         set_solid_color(BLUE);
         break;
       case FLASHING_RED:
-        millis_delay = 100;
+        millis_delay = 166;
         flash_color(RED);
         break;
       case FLASHING_BLUE:
-        millis_delay = 100;
+        millis_delay = 166;
         flash_color(BLUE);      
         break;
       case RED_WITH_BLUE_STRIPE:
-        millis_delay = 100;
+        millis_delay = 50;
         grow_shrink_color(BLUE, RED);
         break;
       case BLUE_WITH_RED_STRIPE:
-        millis_delay = 100;
+        millis_delay = 50;
         grow_shrink_color(RED, BLUE);
         break;
       default:
