@@ -3,10 +3,12 @@
 // UPDATE THESE 
 #define LEDS_PER_TOWER 32
 #define LEDS_IN_BASE 42
-#define DATA_PIN_TOWER_1 2
-#define DATA_PIN_TOWER_2 3
-#define DATA_PIN_BASE 4
+#define DATA_PIN_TOWER_1 3
+#define DATA_PIN_TOWER_2 4
+#define CLOCK_PIN_TOWER_2 5
+#define DATA_PIN_BASE 2
 #define COLOR_ORDER GRB
+#define APA102_COLOR_ORDER BGR
 #define BRIGHTNESS 156
 
 // define the pin numbers for the DIO input "switches"
@@ -66,7 +68,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   FastLED.addLeds<WS2812B, DATA_PIN_TOWER_1, COLOR_ORDER>(tower_1_leds, LEDS_PER_TOWER);
-  FastLED.addLeds<WS2812B, DATA_PIN_TOWER_2, COLOR_ORDER>(tower_2_leds, LEDS_PER_TOWER);
+  FastLED.addLeds<APA102, DATA_PIN_TOWER_2, CLOCK_PIN_TOWER_2, APA102_COLOR_ORDER>(tower_2_leds, LEDS_PER_TOWER);
   FastLED.addLeds<WS2812B, DATA_PIN_BASE, COLOR_ORDER>(base_leds, LEDS_IN_BASE);
   FastLED.setBrightness(BRIGHTNESS);
 }
@@ -166,8 +168,12 @@ void grow_shrink_color(int foreground_color, int background_color) {
       tower_2_leds[i] = get_color_from_name(background_color);
     }
   }
-  for (int i = 0; i < LEDS_IN_BASE; i++) {
-    base_leds[i] = foreground_color;
+  for (int j = 0; j < LEDS_IN_BASE; j++) {
+    if (j <= current_pos) {
+      base_leds[j] = get_color_from_name(foreground_color);
+    } else {
+      base_leds[j] = get_color_from_name(background_color);
+    }
   }
   FastLED.show();
 
@@ -232,7 +238,7 @@ int get_next_pattern() {
 
 void loop() {
   static int millis_delay = 300;
-  static int pattern = RED_WITH_BLUE_STRIPE;
+  static int pattern = RAINBOW;
 //  set_solid_color(RED);
 //   EVERY_N_MILLISECONDS(10) {
 //     // poll the rio every 10 milliseconds
