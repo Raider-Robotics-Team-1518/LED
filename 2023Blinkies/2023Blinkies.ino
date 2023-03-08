@@ -239,13 +239,11 @@ int get_next_pattern() {
 void loop() {
   static int millis_delay = 300;
   static int pattern = RAINBOW;
-//  set_solid_color(RED);
-//   EVERY_N_MILLISECONDS(10) {
-//     // poll the rio every 10 milliseconds
-//     pattern = get_selected_pattern_from_rio();
-//   }
+   EVERY_N_MILLISECONDS(10) {
+     // poll the rio every 10 milliseconds
+     pattern = get_selected_pattern_from_rio();
+   }
 //  EVERY_N_SECONDS(2) {
-//    // poll the rio every 10 milliseconds
 //    pattern = get_next_pattern();
 //  }
   EVERY_N_MILLIS_I(loop_timer, 10) {
