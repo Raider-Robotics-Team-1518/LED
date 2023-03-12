@@ -243,9 +243,6 @@ void loop() {
      // poll the rio every 10 milliseconds
      pattern = get_selected_pattern_from_rio();
    }
-//  EVERY_N_SECONDS(2) {
-//    pattern = get_next_pattern();
-//  }
   EVERY_N_MILLIS_I(loop_timer, 10) {
     switch (pattern) {
       case ALL_OFF:
