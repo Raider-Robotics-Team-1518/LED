@@ -1,9 +1,10 @@
 #include <FastLED.h>
 
 // UPDATE THESE
-#define NUM_LEDS 32
-#define LEDS_PER_SIDE 16
+#define NUM_LEDS 56
+#define LEDS_PER_SIDE 28
 #define DATA_PIN 2
+#define DATA_PIN2 3
 #define COLOR_ORDER GRB
 #define BRIGHTNESS 156
 
@@ -34,7 +35,6 @@
 #define RAINBOW 7
 
 // constants for the light sequences to show
-#define ALL_OFF 0
 #define OFF 0
 #define ALL_RED 1
 #define ALL_BLUE 2
@@ -50,10 +50,9 @@ CRGBPalette16 currentPalette = RainbowColors_p;
 TBlendType currentBlending = LINEARBLEND;
 
 // you shouldn't need to modify these variables
-CRGB realleds[NUM_LEDS];
-CRGBArray<NUM_LEDS> leds;
-CRGBSet left_side_leds(leds(LEDS_PER_SIDE - 1, 0));
-CRGBSet right_side_leds(leds(LEDS_PER_SIDE, NUM_LEDS - 1));
+// CRGB realleds[NUM_LEDS];
+CRGB left_side_leds[LEDS_PER_SIDE];
+CRGB right_side_leds[LEDS_PER_SIDE];
 int currentColor = BLACK;
 int flash_state = 0;
 int current_pos = 0;
@@ -71,7 +70,8 @@ void setup() {
 
   Serial.begin(115200);
   delay(1000);
-  FastLED.addLeds<WS2812B, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, DATA_PIN, COLOR_ORDER>(left_side_leds, LEDS_PER_SIDE);
+  FastLED.addLeds<WS2812B, DATA_PIN2, COLOR_ORDER>(right_side_leds, LEDS_PER_SIDE);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
@@ -107,7 +107,8 @@ CRGB get_color_from_name(int color) {
       clr = CRGB::Purple;
       break;
     case OFF:
-    case ALL_OFF:
+      clr = CRGB::Black;
+      break;
     default:
       clr = CRGB::Black;
       break;
@@ -198,15 +199,11 @@ void grow_shrink_color(int foreground_color, int background_color) {
 }
 
 void FillLEDsFromPaletteColors(uint8_t colorIndex) {
-  for (int j = 0; j < LEDS_IN_BASE; j++) {
-    if (j < LEDS_PER_TOWER) {
-      tower_1_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
+  for (int j = 0; j < NUM_LEDS; j++) {
+    left_side_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
                                          currentBlending);
-      tower_2_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
-                                         currentBlending);
-    }
-    base_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
-                                    currentBlending);
+    right_side_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
+                                          currentBlending);
     colorIndex += 3;
   }
 }
@@ -257,7 +254,6 @@ void loop() {
   */
   EVERY_N_MILLIS_I(loop_timer, 200) {
     switch (pattern) {
-      case ALL_OFF:
       case OFF:
         set_solid_color(BLACK);
         break;
@@ -282,20 +278,9 @@ void loop() {
       case RAINBOW:
         millis_delay = 1;
         animatePalette();
-      case FLASHING_BLUE:
-        millis_delay = 166;
-        flash_color(BLUE);
-        break;
-      case RED_WITH_BLUE_STRIPE:
-        millis_delay = 50;
-        grow_shrink_color(BLUE, RED);
-        break;
-      case BLUE_WITH_RED_STRIPE:
-        millis_delay = 50;
-        grow_shrink_color(RED, BLUE);
-        break;
       default:
-        set_solid_color(BLACK);
+        millis_delay = 1;
+        animatePalette();
     }
     loop_timer.setPeriod(millis_delay);
   }
