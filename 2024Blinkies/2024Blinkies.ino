@@ -98,7 +98,7 @@ CRGB get_color_from_name(int color) {
       clr = CRGB::Green;
       break;
     case ORANGE:
-      clr = CRGB::Orange;
+      clr = CRGB::OrangeRed;
       break;
     case YELLOW:
       clr = CRGB::Yellow;
@@ -204,12 +204,12 @@ void FillLEDsFromPaletteColors(uint8_t colorIndex) {
                                          currentBlending);
     right_side_leds[j] = ColorFromPalette(currentPalette, colorIndex, BRIGHTNESS,
                                           currentBlending);
-    colorIndex += 3;
+    colorIndex += 6;
   }
 }
 void animatePalette() {
   static uint8_t startIndex = 0;
-  startIndex = startIndex + 1; /* motion speed */
+  startIndex = startIndex + 6; /* motion speed */
 
   FillLEDsFromPaletteColors(startIndex);
   FastLED.show();
@@ -236,11 +236,13 @@ int get_selected_pattern_from_rio() {
 }
 
 void loop() {
+  Serial.println("loop function");
   static int millis_delay = 300;
   static int pattern = 0;
   EVERY_N_MILLISECONDS(10) {
     // poll the rio every 10 milliseconds
-    pattern = get_selected_pattern_from_rio();
+    Serial.println("getting new pattern from RoboRio")
+      pattern = get_selected_pattern_from_rio();
   }
   /** from Robot code:
       OFF(false, false, false), // 0
@@ -253,34 +255,44 @@ void loop() {
       RAINBOW(true, true, true); // 7
   */
   EVERY_N_MILLIS_I(loop_timer, 200) {
+    Serial.println(pattern);
     switch (pattern) {
       case OFF:
+        millis_delay = 200;
         set_solid_color(BLACK);
         break;
       case ALL_RED:
+        millis_delay = 200;
         set_solid_color(RED);
         break;
       case ALL_BLUE:
+        millis_delay = 200;
         set_solid_color(BLUE);
         break;
       case GREEN:
+        millis_delay = 200;
         set_solid_color(GREEN);
         break;
       case ORANGE:
+        millis_delay = 200;
         set_solid_color(ORANGE);
         break;
       case YELLOW:
+        millis_delay = 200;
         set_solid_color(YELLOW);
         break;
       case PURPLE:
+        millis_delay = 200;
         set_solid_color(PURPLE);
         break;
       case RAINBOW:
-        millis_delay = 1;
+        millis_delay = 200;
         animatePalette();
+        break;
       default:
-        millis_delay = 1;
-        animatePalette();
+        millis_delay = 200;
+        set_solid_color(BLACK);
+        break;
     }
     loop_timer.setPeriod(millis_delay);
   }
